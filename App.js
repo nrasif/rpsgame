@@ -1,9 +1,18 @@
 import React, { useState, useEffect } from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
 import { ScrollView, StyleSheet, Alert } from 'react-native';
 import { auth } from './src/services/firebase';
 import { onAuthStateChanged, signOut, signInWithEmailAndPassword, createUserWithEmailAndPassword } from '@firebase/auth';
 import AuthScreen from './src/components/AuthScreen';
 import AuthenticatedScreen from './src/components/AuthenticatedScreen';
+
+import HomeScreen from './src/components/HomeScreen';
+import PlayScreen from './src/components/PlayScreen';
+import ProfileScreen from './src/components/ProfileScreen';
+import SettingsScreen from './src/components/SettingsScreen';
+
+const Stack = createStackNavigator();
 
 const App = () => {
   const [email, setEmail] = useState('');
@@ -69,26 +78,44 @@ const App = () => {
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      {user ? (
-        // Show user's email if user is authenticated
-        <AuthenticatedScreen user={user} handleAuthentication={handleAuthentication} isGuest={isGuest} handleGuestLogout={handleGuestLogout} />
-      ) : (
-        // Show sign-in or sign-up form if user is not authenticated
-        <AuthScreen
-          email={email}
-          setEmail={setEmail}
-          password={password}
-          setPassword={setPassword}
-          isLogin={isLogin}
-          setIsLogin={setIsLogin}
-          handleAuthentication={handleAuthentication}
-          handleGuestLogin={handleGuestLogin}
-        />
-      )}
-    </ScrollView>
+    <NavigationContainer>
+      <Stack.Navigator>
+        {user ? (
+          <Stack.Screen name="Home">
+            {(props) => (
+              <HomeScreen
+                {...props}
+                user={user}
+                handleAuthentication={handleAuthentication}
+                isGuest={isGuest}
+                handleGuestLogout={handleGuestLogout}
+              />
+            )}
+          </Stack.Screen>
+        ) : (
+          <Stack.Screen name="Auth">
+            {(props) => (
+              <AuthScreen
+                {...props}
+                email={email}
+                setEmail={setEmail}
+                password={password}
+                setPassword={setPassword}
+                isLogin={isLogin}
+                setIsLogin={setIsLogin}
+                handleAuthentication={handleAuthentication}
+                handleGuestLogin={handleGuestLogin}
+              />
+            )}
+          </Stack.Screen>
+        )}
+        <Stack.Screen name="Play" component={PlayScreen} />
+        <Stack.Screen name="Profile" component={ProfileScreen} />
+        <Stack.Screen name="Settings" component={SettingsScreen} />
+      </Stack.Navigator>
+    </NavigationContainer>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
