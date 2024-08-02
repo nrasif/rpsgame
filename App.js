@@ -10,6 +10,7 @@ const App = () => {
   const [password, setPassword] = useState('');
   const [user, setUser] = useState(null); // Track user authentication state
   const [isLogin, setIsLogin] = useState(true);
+  const [isGuest, setIsGuest] = useState(false); // Track if the user is a guest
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -21,17 +22,24 @@ const App = () => {
 
   const handleAuthentication = async () => {
     try {
+      // Validate email format
+      if (!/\S+@\S+\.\S+/.test(email)) {
+        Alert.alert('Error', 'Please enter a valid email address.');
+        return;
+      }
+
+      // Check if password is at least 6 characters
+      if (password.length < 6) {
+        Alert.alert('Error', 'Password must be at least 6 characters long.');
+        return;
+      }
+
       if (user) {
         // If user is already authenticated, log out
         console.log('User logged out successfully!');
         await signOut(auth);
+        setIsGuest(false);
       } else {
-        // Check if password is at least 6 characters
-        if (password.length < 6) {
-          Alert.alert('Error', 'Password must be at least 6 characters long.');
-          return;
-        }
-
         // Sign in or sign up
         if (isLogin) {
           // Sign in
@@ -49,11 +57,22 @@ const App = () => {
     }
   };
 
+  const handleGuestLogin = () => {
+    setIsGuest(true);
+    setUser({ displayName: 'Guest' }); // Set a mock user object with displayName 'Guest'
+  };
+
+  const handleGuestLogout = () => {
+    setIsGuest(false);
+    setUser(null);
+    setIsLogin(true); // Ensure the login form is displayed
+  };
+
   return (
     <ScrollView contentContainerStyle={styles.container}>
       {user ? (
         // Show user's email if user is authenticated
-        <AuthenticatedScreen user={user} handleAuthentication={handleAuthentication} />
+        <AuthenticatedScreen user={user} handleAuthentication={handleAuthentication} isGuest={isGuest} handleGuestLogout={handleGuestLogout} />
       ) : (
         // Show sign-in or sign-up form if user is not authenticated
         <AuthScreen
@@ -64,6 +83,7 @@ const App = () => {
           isLogin={isLogin}
           setIsLogin={setIsLogin}
           handleAuthentication={handleAuthentication}
+          handleGuestLogin={handleGuestLogin}
         />
       )}
     </ScrollView>

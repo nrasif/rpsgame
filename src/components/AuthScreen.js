@@ -1,12 +1,11 @@
 import React from 'react';
 import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
 
-const AuthScreen = ({ email, setEmail, password, setPassword, isLogin, setIsLogin, handleAuthentication }) => {
+const AuthScreen = ({ email, setEmail, password, setPassword, isLogin, setIsLogin, handleAuthentication, handleGuestLogin }) => {
   return (
     <View style={styles.authContainer}>
-       <Text style={styles.title}>{isLogin ? 'Sign In' : 'Sign Up'}</Text>
-
-       <TextInput
+      <Text style={styles.title}>{isLogin ? 'Sign In' : 'Sign Up'}</Text>
+      <TextInput
         style={styles.input}
         value={email}
         onChangeText={setEmail}
@@ -23,7 +22,9 @@ const AuthScreen = ({ email, setEmail, password, setPassword, isLogin, setIsLogi
       <View style={styles.buttonContainer}>
         <Button title={isLogin ? 'Sign In' : 'Sign Up'} onPress={handleAuthentication} color="#3498db" />
       </View>
-
+      <View style={styles.buttonContainer}>
+        <Button title="Play as Guest" onPress={handleGuestLogin} color="#95a5a6" />
+      </View>
       <View style={styles.bottomContainer}>
         <Text style={styles.toggleText} onPress={() => setIsLogin(!isLogin)}>
           {isLogin ? 'Need an account? Sign Up' : 'Already have an account? Sign In'}
@@ -31,7 +32,7 @@ const AuthScreen = ({ email, setEmail, password, setPassword, isLogin, setIsLogi
       </View>
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   authContainer: {
