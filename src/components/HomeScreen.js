@@ -9,7 +9,11 @@ const HomeScreen = ({ navigation, user, handleAuthentication, isGuest, handleGue
       <Button title="Play" onPress={() => navigation.navigate('RoundSettings')} />
       <Button title="Profile" onPress={() => navigation.navigate('Profile')} />
       <Button title="Settings" onPress={() => navigation.navigate('Settings')} />
-      <Button title={isGuest ? 'Login' : 'Logout'} onPress={isGuest ? handleGuestLogout : handleAuthentication} color="#e74c3c" />
+      <Button
+        title={isGuest ? 'Login' : 'Logout'}
+        onPress={isGuest ? handleGuestLogout : handleAuthentication}  // Ensure correct function is called
+        color="#e74c3c"
+      />
     </View>
   );
 };

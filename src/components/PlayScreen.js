@@ -25,6 +25,8 @@ const PlayScreen = ({ route, navigation }) => {
   }, [currentRound, rounds, userScore, botScore, navigation]);
 
   const handlePlayRound = (userMove) => {
+    if (currentRound > rounds) return;
+
     const choices = ['rock', 'paper', 'scissors'];
     const botMove = choices[Math.floor(Math.random() * 3)];
 
@@ -47,7 +49,12 @@ const PlayScreen = ({ route, navigation }) => {
     }
 
     setResult(roundResult);
-    setCurrentRound(currentRound + 1);
+
+    if (currentRound < rounds) {
+      setCurrentRound(currentRound + 1);
+    } else {
+      setCurrentRound(currentRound + 1);  // Trigger the useEffect to navigate to Result screen
+    }
   };
 
   const images = {
@@ -58,7 +65,9 @@ const PlayScreen = ({ route, navigation }) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.roundText}>Round: {currentRound}</Text>
+      {currentRound <= rounds && (
+        <Text style={styles.roundText}>Round: {currentRound}</Text>
+      )}
       {userChoice && botChoice && (
         <View style={styles.resultContainer}>
           <View style={styles.choiceContainer}>
@@ -73,27 +82,31 @@ const PlayScreen = ({ route, navigation }) => {
           </View>
         </View>
       )}
-      <Text style={styles.title}>Choose Your Move</Text>
-      <View style={styles.choicesContainer}>
-        <TouchableOpacity onPress={() => handlePlayRound('rock')}>
-          <View style={styles.choiceItem}>
-            <Image source={images.rock} style={styles.choiceImage} />
-            <Text style={styles.choiceText}>Rock</Text>
-          </View>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => handlePlayRound('paper')}>
-          <View style={styles.choiceItem}>
-            <Image source={images.paper} style={styles.choiceImage} />
-            <Text style={styles.choiceText}>Paper</Text>
-          </View>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => handlePlayRound('scissors')}>
-          <View style={styles.choiceItem}>
-            <Image source={images.scissors} style={styles.choiceImage} />
-            <Text style={styles.choiceText}>Scissors</Text>
-          </View>
-        </TouchableOpacity>
-      </View>
+      {currentRound <= rounds && (
+        <Text style={styles.title}>Choose Your Move</Text>
+      )}
+      {currentRound <= rounds && (
+        <View style={styles.choicesContainer}>
+          <TouchableOpacity onPress={() => handlePlayRound('rock')}>
+            <View style={styles.choiceItem}>
+              <Image source={images.rock} style={styles.choiceImage} />
+              <Text style={styles.choiceText}>Rock</Text>
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => handlePlayRound('paper')}>
+            <View style={styles.choiceItem}>
+              <Image source={images.paper} style={styles.choiceImage} />
+              <Text style={styles.choiceText}>Paper</Text>
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => handlePlayRound('scissors')}>
+            <View style={styles.choiceItem}>
+              <Image source={images.scissors} style={styles.choiceImage} />
+              <Text style={styles.choiceText}>Scissors</Text>
+            </View>
+          </TouchableOpacity>
+        </View>
+      )}
     </View>
   );
 };
