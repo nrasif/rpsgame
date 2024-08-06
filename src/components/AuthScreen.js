@@ -29,9 +29,11 @@ const AuthScreen = ({
           secureTextEntry
         />
         <Button title={isLogin ? 'Sign In' : 'Sign Up'} onPress={handleAuthentication} />
-        <TouchableOpacity onPress={handleGuestLogin}>
-          <Text style={styles.guestText}>Play as Guest</Text>
-        </TouchableOpacity>
+        {isLogin && (
+          <TouchableOpacity onPress={handleGuestLogin}>
+            <Text style={styles.guestText}>Play as Guest</Text>
+          </TouchableOpacity>
+        )}
         <TouchableOpacity onPress={() => setIsLogin(!isLogin)}>
           <Text style={styles.toggleText}>
             {isLogin ? 'Need an account? Sign Up' : 'Already have an account? Sign In'}
