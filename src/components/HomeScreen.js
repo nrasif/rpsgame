@@ -6,7 +6,7 @@ const HomeScreen = ({ navigation, user, handleAuthentication, isGuest, handleGue
     <View style={styles.container}>
       <Text style={styles.title}>Welcome</Text>
       <Text style={styles.emailText}>{isGuest ? 'Guest' : user.email}</Text>
-      <Button title="Play" onPress={() => navigation.navigate('Play')} />
+      <Button title="Play" onPress={() => navigation.navigate('RoundSettings')} />
       <Button title="Profile" onPress={() => navigation.navigate('Profile')} />
       <Button title="Settings" onPress={() => navigation.navigate('Settings')} />
       <Button title={isGuest ? 'Login' : 'Logout'} onPress={isGuest ? handleGuestLogout : handleAuthentication} color="#e74c3c" />
