@@ -7,11 +7,10 @@ import { onAuthStateChanged, signOut, signInWithEmailAndPassword, createUserWith
 import AuthScreen from './src/components/AuthScreen';
 import HomeScreen from './src/components/HomeScreen';
 import PlayScreen from './src/components/PlayScreen';
-import ProfileScreen from './src/components/ProfileScreen';
+import AboutUsScreen from './src/components/AboutUsScreen';
 import SettingsScreen from './src/components/SettingsScreen';
 import * as SplashScreen from 'expo-splash-screen';
 import RoundSettingsScreen from './src/components/RoundSettingsScreen';
-import ResultScreen from './src/components/ResultScreen';
 import * as Font from 'expo-font';
 
 const Stack = createStackNavigator();
@@ -45,11 +44,7 @@ const App = () => {
         const unsubscribe = onAuthStateChanged(auth, (user) => {
           setUser(user);
           setIsLoading(false);
-          if (user) {
-            SplashScreen.hideAsync();
-          } else {
-            SplashScreen.hideAsync();
-          }
+          SplashScreen.hideAsync(); // Hide splash screen when auth state is checked
         });
   
         // Cleanup
@@ -57,7 +52,7 @@ const App = () => {
       } catch (error) {
         console.error('Error checking auth state:', error);
         setIsLoading(false);
-        SplashScreen.hideAsync();
+        SplashScreen.hideAsync(); // Hide splash screen in case of error
       }
     };
   
@@ -67,12 +62,10 @@ const App = () => {
   const handleAuthentication = async () => {
     try {
       if (user) {
-        // If user is logged in, sign them out
         await signOut(auth);
         setIsGuest(false);
         setUser(null);  // Clear user state
       } else {
-        // Handle sign in or sign up based on isLogin state
         if (!/\S+@\S+\.\S+/.test(email)) {
           Alert.alert('Error', 'Please enter a valid email address.');
           return;
@@ -132,13 +125,8 @@ const App = () => {
             </Stack.Screen>
             <Stack.Screen name="RoundSettings" component={RoundSettingsScreen} />
             <Stack.Screen name="Play" component={PlayScreen} />
-            <Stack.Screen name="Profile" component={ProfileScreen} />
+            <Stack.Screen name="AboutUsScreen" component={AboutUsScreen} />
             <Stack.Screen name="Settings" component={SettingsScreen} />
-            <Stack.Screen 
-              name="Result" 
-              component={ResultScreen} 
-              options={{ presentation: 'modal' }} 
-            />
           </>
         ) : (
           <Stack.Screen name="Auth">
