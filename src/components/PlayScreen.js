@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, Image, TouchableOpacity, StyleSheet, Animated, Button } from 'react-native';
+import ResultScreen from './ResultScreen';
 
 const PlayScreen = ({ route, navigation }) => {
   const { rounds } = route.params;
@@ -9,6 +10,9 @@ const PlayScreen = ({ route, navigation }) => {
   const [userChoice, setUserChoice] = useState(null);
   const [botChoice, setBotChoice] = useState(null);
   const [result, setResult] = useState(null);
+  const [finalResult, setFinalResult] = useState(null);
+  const [fadeAnim] = useState(new Animated.Value(0));
+  const [modalVisible, setModalVisible] = useState(false);
 
   useEffect(() => {
     if (currentRound > rounds) {
@@ -20,9 +24,14 @@ const PlayScreen = ({ route, navigation }) => {
       } else {
         finalResult = 'It\'s a Draw!';
       }
-      navigation.navigate('Result', { result: finalResult });
+      setFinalResult(finalResult);
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 700, // Adjust duration for fade-in effect
+        useNativeDriver: true,
+      }).start(() => setModalVisible(true));
     }
-  }, [currentRound, rounds, userScore, botScore, navigation]);
+  }, [currentRound, rounds, userScore, botScore]);
 
   const handlePlayRound = (userMove) => {
     if (currentRound > rounds) return;
@@ -50,10 +59,39 @@ const PlayScreen = ({ route, navigation }) => {
 
     setResult(roundResult);
 
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 500,
+      useNativeDriver: true,
+    }).start();
+
+    if (currentRound === rounds) {
+      setTimeout(() => {
+        let finalResult;
+        if (userScore > botScore) {
+          finalResult = 'You Win!';
+        } else if (userScore < botScore) {
+          finalResult = 'You Lose!';
+        } else {
+          finalResult = 'It\'s a Draw!';
+        }
+        setFinalResult(finalResult);
+        Animated.timing(fadeAnim, {
+          toValue: 1,
+          duration: 700, // Adjust duration for fade-in effect
+          useNativeDriver: true,
+        }).start(() => setModalVisible(true));
+      }, 1000);
+    }
+  };
+
+  const handleNextRound = () => {
     if (currentRound < rounds) {
       setCurrentRound(currentRound + 1);
-    } else {
-      setCurrentRound(currentRound + 1);  // Trigger the useEffect to navigate to Result screen
+      setUserChoice(null);
+      setBotChoice(null);
+      setResult(null);
+      fadeAnim.setValue(0);
     }
   };
 
@@ -69,7 +107,7 @@ const PlayScreen = ({ route, navigation }) => {
         <Text style={styles.roundText}>Round: {currentRound}</Text>
       )}
       {userChoice && botChoice && (
-        <View style={styles.resultContainer}>
+        <Animated.View style={[styles.resultContainer, { opacity: fadeAnim }]}>
           <View style={styles.choiceContainer}>
             <Text style={styles.choiceLabel}>You</Text>
             <Image source={images[userChoice]} style={styles.choiceImage} />
@@ -80,12 +118,12 @@ const PlayScreen = ({ route, navigation }) => {
             <Text style={styles.choiceLabel}>Bot</Text>
             <Image source={images[botChoice]} style={styles.choiceImage} />
           </View>
-        </View>
+        </Animated.View>
       )}
-      {currentRound <= rounds && (
+      {currentRound <= rounds && !userChoice && (
         <Text style={styles.title}>Choose Your Move</Text>
       )}
-      {currentRound <= rounds && (
+      {currentRound <= rounds && !userChoice && (
         <View style={styles.choicesContainer}>
           <TouchableOpacity onPress={() => handlePlayRound('rock')}>
             <View style={styles.choiceItem}>
@@ -106,6 +144,18 @@ const PlayScreen = ({ route, navigation }) => {
             </View>
           </TouchableOpacity>
         </View>
+      )}
+      {userChoice && botChoice && currentRound < rounds && (
+        <Button title="Next Round" onPress={handleNextRound} />
+      )}
+      {modalVisible && (
+        <Animated.View style={[styles.centeredView, { opacity: fadeAnim }]}>
+          <ResultScreen
+            route={{ params: { result: finalResult } }}
+            navigation={navigation}
+            setModalVisible={setModalVisible}
+          />
+        </Animated.View>
       )}
     </View>
   );
@@ -164,6 +214,16 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     marginTop: 10,
+  },
+  centeredView: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
 });
 

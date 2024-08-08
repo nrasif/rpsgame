@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import { Alert, LogBox } from 'react-native';
+import { Alert, LogBox, ActivityIndicator, View } from 'react-native';
 import { auth } from './src/services/firebase';
 import { onAuthStateChanged, signOut, signInWithEmailAndPassword, createUserWithEmailAndPassword } from '@firebase/auth';
 import AuthScreen from './src/components/AuthScreen';
@@ -12,7 +12,7 @@ import SettingsScreen from './src/components/SettingsScreen';
 import * as SplashScreen from 'expo-splash-screen';
 import RoundSettingsScreen from './src/components/RoundSettingsScreen';
 import ResultScreen from './src/components/ResultScreen';
-import { ActivityIndicator, View } from 'react-native';
+import * as Font from 'expo-font';
 
 const Stack = createStackNavigator();
 
@@ -25,8 +25,21 @@ const App = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [isGuest, setIsGuest] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [fontsLoaded, setFontsLoaded] = useState(false);
 
   useEffect(() => {
+    const loadFonts = async () => {
+      await Font.loadAsync({
+        'Nunito-Regular': require('./assets/fonts/Nunito-Regular.ttf'),
+        'Nunito-Bold': require('./assets/fonts/Nunito-Bold.ttf'),
+        'Nunito-Light': require('./assets/fonts/Nunito-Light.ttf'),
+        'Nunito-Black': require('./assets/fonts/Nunito-Black.ttf'),
+      });
+      setFontsLoaded(true);
+    };
+
+    loadFonts();
+
     const checkAuthState = async () => {
       try {
         const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -93,7 +106,7 @@ const App = () => {
     setIsLogin(true);  // Reset to login state
   };  
 
-  if (isLoading) {
+  if (isLoading || !fontsLoaded) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
         <ActivityIndicator size="large" color="#0000ff" />
@@ -103,7 +116,7 @@ const App = () => {
 
   return (
     <NavigationContainer>
-      <Stack.Navigator>
+      <Stack.Navigator screenOptions={{ headerShown: false }}>
         {user ? (
           <>
             <Stack.Screen name="Home">
@@ -121,7 +134,11 @@ const App = () => {
             <Stack.Screen name="Play" component={PlayScreen} />
             <Stack.Screen name="Profile" component={ProfileScreen} />
             <Stack.Screen name="Settings" component={SettingsScreen} />
-            <Stack.Screen name="Result" component={ResultScreen} />
+            <Stack.Screen 
+              name="Result" 
+              component={ResultScreen} 
+              options={{ presentation: 'modal' }} 
+            />
           </>
         ) : (
           <Stack.Screen name="Auth">
